@@ -1,0 +1,4 @@
+Flask
+flask-assets
+redis
+pymongo

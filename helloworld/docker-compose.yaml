@@ -1,0 +1,17 @@
+web:
+  build: .
+  ports:
+    - 5000:5000
+  links:
+    - redis
+    - mongo
+  working_dir: /app
+  volumes:
+    - .:/app
+  command: python3 app/server.py
+
+redis:
+  image: redis:latest
+
+mongo:
+  image: mongo
