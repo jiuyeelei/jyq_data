@@ -98,7 +98,7 @@ class KlineModel:
     def get_pandas_dataframe(self, code, mkt):
         db_engine = self.db_helper.get_pandas_engine()
         df = pd.read_sql(
-            f"SELECT * FROM r_stock_kline where code = '{code}' and market = {mkt}",
+            f"SELECT code, trade_date, open_price, close_price, high_price, low_price, trade_amt, trade_val, updown_rate, updown_ratio, exchg_ratio FROM r_stock_kline where code = '{code}' and market = {mkt}",
             db_engine,
         )
 

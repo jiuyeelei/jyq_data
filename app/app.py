@@ -12,4 +12,4 @@ if __name__ == "__main__":
     # kline_crawler.start_craw()
 
     kline_cal = KlineCal()
-    kline_cal.dataframe_from_mysql()
+    kline_cal.dataframe_from_mysql("000001", 1)
