@@ -1,6 +1,7 @@
 from sys import flags
 from helper.db_helper import DBHelper
 from config.config import config
+from datetime import datetime, timedelta
 
 
 class KlineModel:
@@ -74,4 +75,21 @@ class KlineModel:
         except Exception as e:
             print(e)
             print("Error: unable to fetch data")
+        db_conn.close()
+
+    def get_lastest_tdate(self):
+        """获取k线里面最后一根K线的日期"""
+        db_conn = self.db_helper.get_conn()
+        cursor = db_conn.cursor()
+
+        try:
+            select_sql = f"SELECT trade_date  FROM jyq.r_stock_kline order by trade_date desc limit 0, 1"
+            cursor.execute(select_sql)
+            latest_date_str = "".join(cursor.fetchone())
+            latest_date = datetime.strptime(str(latest_date_str), "%Y-%m-%d")
+            targe_date = latest_date + timedelta(days=1)
+            return str(targe_date.strftime("%Y%m%d"))
+        except Exception as e:
+            print(e)
+            return 0
         db_conn.close()

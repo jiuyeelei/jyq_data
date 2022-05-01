@@ -10,6 +10,7 @@ from db.kline import KlineModel
 class KlineCrawler:
     def __init__(self) -> None:
         self.kline_model = KlineModel()
+        self.begin_date = self.kline_model.get_lastest_tdate()
         with open("data/stock_base_info.json", "r") as stk_base_info:
             data = json.load(stk_base_info)
             self.stocks = data
@@ -41,7 +42,7 @@ class KlineCrawler:
             shang mkt: 1,
             shenzheng mkt: 0
         """
-        target_url = f"http://push2his.eastmoney.com/api/qt/stock/kline/get?fields1=f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f11,f12,f13&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61&beg=0&end=20500101&ut=fa5fd1943c7b386f172d6893dbfba10b&rtntype=6&secid={stock_id}&klt=101&fqt=1"
+        target_url = f"http://push2his.eastmoney.com/api/qt/stock/kline/get?fields1=f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f11,f12,f13&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61&beg={self.begin_date}&end=20500101&ut=fa5fd1943c7b386f172d6893dbfba10b&rtntype=6&secid={stock_id}&klt=101&fqt=1"
         async with session.get(target_url) as response:
             result = await response.text()
             stk_data = json.loads(result)["data"]
