@@ -8,13 +8,18 @@ from db.kline import KlineModel
 
 
 class KlineCrawler:
-    def __init__(self) -> None:
+    def __init__(self):
         self.kline_model = KlineModel()
         self.begin_date = self.kline_model.get_lastest_tdate()
-        with open("data/stock_base_info.json", "r") as stk_base_info:
-            data = json.load(stk_base_info)
-            self.stocks = data
+        datas = []
+        with open("data/stock_base_info_stocks.json", "r") as stk_base_info:
+            stock_datas = json.load(stk_base_info)
+            datas = datas + stock_datas
             # self.stocks = [{"market_type": 1, "stock_id": "601318"}]
+        with open("data/stock_base_info_index.json", "r") as index_base_info:
+            index_datas = json.load(index_base_info)
+            datas = datas + index_datas
+        self.stocks = datas
 
     async def craw_all_kline(self):
         my_conn = aiohttp.TCPConnector(limit=10)
@@ -32,7 +37,7 @@ class KlineCrawler:
                         self.craw_target_kline(f"{mkt}.{stk_id}", session=session)
                     )
                     tasks.append(task)
-            await asyncio.gather(*tasks, return_exceptions=False)
+            await asyncio.gather(*tasks, return_exceptions=True)
 
     async def craw_target_kline(self, stock_id, session: ClientSession):
         """get target stock kline from eastmoney site.

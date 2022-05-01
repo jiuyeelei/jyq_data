@@ -2,6 +2,7 @@ from sys import flags
 from helper.db_helper import DBHelper
 from config.config import config
 from datetime import datetime, timedelta
+import pandas as pd
 
 
 class KlineModel:
@@ -93,3 +94,12 @@ class KlineModel:
             print(e)
             return 0
         db_conn.close()
+
+    def get_pandas_dataframe(self, code, mkt):
+        db_engine = self.db_helper.get_pandas_engine()
+        df = pd.read_sql(
+            f"SELECT * FROM r_stock_kline where code = '{code}' and market = {mkt}",
+            db_engine,
+        )
+
+        return df

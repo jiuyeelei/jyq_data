@@ -1,4 +1,5 @@
 import pymysql
+from sqlalchemy import create_engine
 
 
 class DBHelper:
@@ -19,3 +20,9 @@ class DBHelper:
             database="jyq",
         )
         return db
+
+    def get_pandas_engine(self):
+        engine = create_engine(
+            f"mysql+pymysql://{self.config.user}:{self.config.passwd}@{self.config.db_host}:{self.config.port}/jyq"
+        )
+        return engine

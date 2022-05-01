@@ -1,0 +1,31 @@
+[{
+  "market_type": 1,
+  "stock_type": 4352,
+  "stock_id": "000001",
+  "cn_name": "上证指数"
+},{
+  "market_type": 1,
+  "stock_type": 4352,
+  "stock_id": "000016",
+  "cn_name": "上证50"
+},{
+  "market_type": 1,
+  "stock_type": 4352,
+  "stock_id": "000300",
+  "cn_name": "沪深300"
+},{
+  "market_type": 1,
+  "stock_type": 4352,
+  "stock_id": "000905",
+  "cn_name": "中证500"
+},{
+  "market_type": 2,
+  "stock_type": 4352,
+  "stock_id": "399001",
+  "cn_name": "深证成指"
+},{
+  "market_type": 2,
+  "stock_type": 4352,
+  "stock_id": "399006",
+  "cn_name": "创业板指"
+}]

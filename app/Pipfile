@@ -9,6 +9,8 @@ pyyaml = "*"
 black = "*"
 requests = "*"
 aiohttp = "*"
+pandas = "*"
+sqlalchemy = "*"
 
 [dev-packages]
 
