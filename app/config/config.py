@@ -34,8 +34,8 @@ class DevConfig(Config):
 
 
 num = len(sys.argv) - 1
-if num < 1 or num > 1:
-    exit("参数错误..")
+if num < 1:
+    exit("参数错误 config..")
 
 env = sys.argv[1]
 mapping = {"dev": DevConfig, "prod": ProdConfig}

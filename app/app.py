@@ -3,13 +3,22 @@
 import config as conf
 from crawler.kline_crawler import KlineCrawler
 from calculator.kline_cal import KlineCal
+from db.kline import KlineModel
+import sys
 
 if __name__ == "__main__":
-    # kline = Kline()
-    # kline.get_daily_kline("601318")
+    num = len(sys.argv) - 1
+    if num < 2:
+        exit("参数错误 app.." + sys.argv[2])
 
-    # kline_crawler = KlineCrawler()
-    # kline_crawler.start_craw()
-
-    kline_cal = KlineCal()
-    kline_cal.dataframe_from_mysql("000001", 1)
+    func = sys.argv[2]
+    if func == "get_kline":
+        code = sys.argv[3]
+        kline = KlineModel()
+        kline.get_daily_kline("601318")
+    elif func == "craw":
+        kline_crawler = KlineCrawler()
+        kline_crawler.start_craw()
+    elif func == "cal":
+        kline_cal = KlineCal()
+        kline_cal.dataframe_from_mysql("000001", 1)
