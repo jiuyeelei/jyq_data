@@ -19,12 +19,17 @@ class Config(object):
 
 
 class ProdConfig(Config):
+    # Mysql config
     prod_config = get_config("prod")
     dailyprice_config = prod_config["dailyprice_conn"]
     db_host = dailyprice_config["host"]
     port = dailyprice_config["port"]
     user = dailyprice_config["user"]
     passwd = dailyprice_config["passwd"]
+
+    # mongo config
+    mongo_config = prod_config["mongo_conn"]
+    mongo_uri = mongo_config["uri"]
 
 
 class DevConfig(Config):
@@ -34,6 +39,10 @@ class DevConfig(Config):
     port = dailyprice_config["port"]
     user = dailyprice_config["user"]
     passwd = dailyprice_config["passwd"]
+
+    # mongo config
+    mongo_config = dev_config["mongo_conn"]
+    mongo_uri = mongo_config["uri"]
 
 
 num = len(sys.argv) - 1

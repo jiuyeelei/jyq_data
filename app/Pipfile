@@ -12,6 +12,7 @@ aiohttp = "*"
 pandas = "*"
 sqlalchemy = "*"
 loguru = "*"
+pymongo = "*"
 
 [dev-packages]
 

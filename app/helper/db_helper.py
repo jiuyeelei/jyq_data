@@ -2,26 +2,41 @@ import pymysql
 from sqlalchemy import create_engine
 import pandas as pd
 import numpy as np
+from logger.setting import jyqlogger
+import pymongo
 
 
 class DBHelper:
     def __init__(self, config) -> None:
         self.config = config
+        self.init_mongo_conn()
 
-    def get_conn(self):
-        """get database connection
+    def init_mongo_conn(self):
+        """初始化Mongo连接"""
+        self.mongo_client = pymongo.MongoClient(self.config.mongo_uri)
 
-        Returns:
-            Connection: database connection.
-        """
-        db = pymysql.connect(
+    def get_mysql_conn(self):
+        """初始化mysql连接"""
+        mysql_conn = pymysql.connect(
             host=self.config.db_host,
             port=self.config.port,
             user=self.config.user,
             password=self.config.passwd,
             database="jyq",
         )
-        return db
+        return mysql_conn
+
+    def get_conn(self):
+        """get mysql database connection
+
+        Returns:
+            Connection: database connection.
+        """
+        return self.get_mysql_conn()
+
+    def get_mongo_collection(self, collection):
+        """Get mongo collection"""
+        return self.mongo_client["quota"][collection]
 
     def get_pandas_engine(self):
         pd.set_option("display.float_format", lambda x: "%.2f" % x)
