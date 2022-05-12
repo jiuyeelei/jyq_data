@@ -1,9 +1,12 @@
 import yaml
 import sys
+import os
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 def get_config(env):
-    with open(f"./config/config-{env}.yaml", "r") as stream:
+    with open(f"{BASE_DIR}/config/config-{env}.yaml", "r") as stream:
         config = yaml.safe_load(stream)
         return config
 
@@ -37,6 +40,7 @@ num = len(sys.argv) - 1
 if num < 1:
     exit("参数错误 config..")
 
+print("初始化config...")
 env = sys.argv[1]
 mapping = {"dev": DevConfig, "prod": ProdConfig}
 

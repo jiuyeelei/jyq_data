@@ -1,9 +1,9 @@
 #!/usr/bin/python3
 
-import config as conf
 from crawler.kline_crawler import KlineCrawler
 from calculator.kline_cal import KlineCal
 from db.kline import KlineModel
+from logger.setting import jyqlogger
 import sys
 
 if __name__ == "__main__":
@@ -20,5 +20,6 @@ if __name__ == "__main__":
         kline_crawler = KlineCrawler()
         kline_crawler.start_craw()
     elif func == "cal":
+        jyqlogger.info("start to cal111...")
         kline_cal = KlineCal()
         kline_cal.dataframe_from_mysql("000001", 1)
