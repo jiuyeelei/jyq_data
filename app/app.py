@@ -4,7 +4,9 @@ from crawler.kline_crawler import KlineCrawler
 from calculator.kline_cal import KlineCal
 from db.kline import KlineModel
 from db.stock_list import StockList
+from db.fin_data_list import StockFinDataList
 from logger.setting import jyqlogger
+import asyncio
 import sys
 
 if __name__ == "__main__":
@@ -27,3 +29,7 @@ if __name__ == "__main__":
         jyqlogger.info("start to sync stock list")
         stock_list = StockList()
         stock_list.save_stocklist()
+    elif func == "sync_fin_data":
+        jyqlogger.info("start to sync stock fincial data.")
+        stk_fin_list = StockFinDataList()
+        asyncio.run(stk_fin_list.start_to_load())
