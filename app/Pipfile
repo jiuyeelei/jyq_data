@@ -13,6 +13,8 @@ pandas = "*"
 sqlalchemy = "*"
 loguru = "*"
 pymongo = "*"
+selenium = "*"
+pyppeteer = "*"
 
 [dev-packages]
 

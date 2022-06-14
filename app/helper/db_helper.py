@@ -22,7 +22,7 @@ class DBHelper:
             port=self.config.port,
             user=self.config.user,
             password=self.config.passwd,
-            database="jyq",
+            database="invd",
         )
         return mysql_conn
 

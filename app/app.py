@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 from crawler.kline_crawler import KlineCrawler
+from crawler.fcapital_crawler import FCapitalCrawler
 from calculator.kline_cal import KlineCal
 from db.kline import KlineModel
 from db.stock_list import StockList
@@ -33,3 +34,7 @@ if __name__ == "__main__":
         jyqlogger.info("start to sync stock fincial data.")
         stk_fin_list = StockFinDataList()
         asyncio.run(stk_fin_list.start_to_load())
+    elif func == "fcapital":
+        jyqlogger.info("start to fetch foreign capital data.")
+        fcapitalCrawler = FCapitalCrawler()
+        fcapitalCrawler.start_crawfc_dailystat()
