@@ -126,7 +126,7 @@ class FCapitalCrawler:
     async def insert_datas(self, insert_datas):
         db_conn = self.db_helper.get_conn()
         cursor = db_conn.cursor()
-        insert_sql = "INSERT INTO invd.r_daily_fcapital_stat(mkt, trade_date, buy_trades, sell_trades, turnover, buy_amt, sell_amt, sum_buysell_amt, daily_quota_balance, daily_quota_balance_percet) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        insert_sql = "INSERT INTO invd.r_daily_fcapital_stat(mkt, trade_date, turnover, buy_trades, sell_trades, sum_buysell_amt, buy_amt, sell_amt, daily_quota_balance, daily_quota_balance_percet) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
         cursor.executemany(insert_sql, insert_datas)
         db_conn.commit()
         db_conn.close()
