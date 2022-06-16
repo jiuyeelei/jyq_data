@@ -1,3 +1,4 @@
+import common.consts as const
 from datetime import datetime, timedelta
 from importlib.resources import contents
 import time
@@ -18,21 +19,27 @@ class FCapitalCrawler:
         self.db_helper = DBHelper(config)
 
     def start_crawfc_dailystat(self):
+        """每日统计爬取
+        获取每日北向资金流入流出数据
+        """
         asyncio.get_event_loop().run_until_complete(self.craw_daily_stat())
 
-    async def craw_daily_stat(self):
-        """crawler daily stat of foreign capital from HK exchange site."""
-        browser = await launch()
+    def get_target_dates(self, start_date, format="%Y%m%d"):
+        """_summary_ 传入start_date 获取 start_date 到今天的数据
 
-        startDate = await self.getLastFCapitalDate()
-        endDate = time.strftime("%Y%m%d", datetime.now().timetuple())
+        Args:
+            start_date (string): 开始日期
+
+        Returns:
+            数组: 返回目标日期的列表
+        """
         targetDates = []
+        endDate = time.strftime(format, datetime.now().timetuple())
         # 大于数据库里最新一条的交易日的日期的数据都加到targetDates这个数组
         while True:
-            startDate += timedelta(days=1)
-            date = time.strftime("%Y%m%d", startDate.timetuple())
-
-            if int(endDate) <= int(date):
+            start_date += timedelta(days=1)
+            date = time.strftime(format, start_date.timetuple())
+            if int(endDate.replace("/", "")) <= int(date.replace("/", "")):
 
                 # 如果当前的时间>=15.30 则把当天的日期也加入到targetDates
                 nowDateStr = time.strftime("%M%H%s", datetime.now().timetuple())
@@ -46,6 +53,14 @@ class FCapitalCrawler:
             else:
                 targetDates.append(date)
 
+        return targetDates
+
+    async def craw_daily_stat(self):
+        """crawler daily stat of foreign capital from HK exchange site."""
+        browser = await launch()
+
+        start_date = await self.get_lastfc_stat_date()
+        targetDates = self.get_target_dates(start_date=start_date)
         for idx, d in enumerate(targetDates):
             page = await browser.newPage()
             url = f"https://www.hkex.com.hk/chi/csm/DailyStat/data_tab_daily_{d}c.js"
@@ -111,7 +126,7 @@ class FCapitalCrawler:
                     )
                 jyqlogger.info("the insert data is {}", insert_datas)
                 if len(insert_datas) > 0:
-                    await self.insert_datas(insert_datas)
+                    await self.insert_stat_datas(insert_datas)
             else:
                 jyqlogger.warning("data: {} not exists", d)
 
@@ -123,7 +138,7 @@ class FCapitalCrawler:
                 await browser.close()
                 jyqlogger.info("the browser is closed.")
 
-    async def insert_datas(self, insert_datas):
+    async def insert_stat_datas(self, insert_datas):
         db_conn = self.db_helper.get_conn()
         cursor = db_conn.cursor()
         insert_sql = "INSERT INTO invd.r_daily_fcapital_stat(mkt, trade_date, turnover, buy_trades, sell_trades, sum_buysell_amt, buy_amt, sell_amt, daily_quota_balance, daily_quota_balance_percet) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
@@ -132,8 +147,8 @@ class FCapitalCrawler:
         db_conn.close()
         jyqlogger.info("数据插入完成!")
 
-    async def getLastFCapitalDate(self):
-        """从数据库获取最新的一条的统计数据的日期，
+    async def get_lastfc_stat_date(self):
+        """从r_daily_fcapital_stat表里获取最新的一条的统计数据的日期，
         即数据从最新一条数据之后的日期开始
         """
         db_conn = self.db_helper.get_conn()
@@ -142,6 +157,87 @@ class FCapitalCrawler:
         try:
             cursor.execute(
                 f"SELECT trade_date  FROM r_daily_fcapital_stat  ORDER BY trade_date DESC limit 1"
+            )
+            rows = cursor.fetchall()
+            print(len(rows))
+            for r in rows:
+                startDate = r[0]
+
+            jyqlogger.info("the start date is:{}", startDate)
+
+        except Exception as e:
+            jyqlogger.error("Error: unable to fetch data. -->{}", e)
+
+        db_conn.close()
+        return startDate
+
+    def start_crawfc_holding_data(self):
+        """获取北向资金每日持仓数据"""
+        # asyncio.gather(
+        # self.craw_daily_holding(const.FC_MARKET_TYPE_SH),
+        # self.craw_daily_holding(const.FC_MARKET_TYPE_SZ),
+        # )
+        asyncio.get_event_loop().run_until_complete(
+            self.craw_daily_holding(const.FC_MARKET_TYPE_SH)
+        )
+
+    async def craw_daily_holding(self, market):
+        browser = await launch({"headless": False})
+
+        start_date = await self.get_last_hoding_date()
+        targetDates = self.get_target_dates(start_date=start_date, format="%Y/%m/%d")
+        for idx, d in enumerate(targetDates):
+            page = await browser.newPage()
+            url = f"https://www.hkexnews.hk/sdw/search/mutualmarket_c.aspx?t={market}"
+            jyqlogger.info("the target data is {}, the target url is {}", d, url)
+            await page.goto(url)
+            date_field_selector = await page.querySelector("#txtShareholdingDate")
+            search_btn_selector = await page.querySelector("#btnSearch")
+
+            await page.querySelectorEval(
+                "#txtShareholdingDate", f"el => el.value = '{d}'"
+            ),
+
+            await search_btn_selector.click()
+
+            await page.waitForNavigation()
+
+            result = await page.evaluate(
+                """
+                document.getElementById('pnlResult').children[0].children[0].innerText
+                """
+            )
+            jyqlogger.info("the result is {}", result)
+
+            values = await page.evaluate(
+                """() => [...document.querySelectorAll('#mutualmarket-result > tbody > tr')]
+                   .map(element => element.innerText)
+                """
+            )
+            for d in values:
+                print(d.replace("\n", "").split("\t"))
+                print("\n")
+
+            # TODO 将数据存入到数据库
+
+            ####
+            if not page.isClosed():
+                await page.close()
+
+            if idx == len(targetDates) - 1:
+                await browser.close()
+                jyqlogger.info("the browser is closed.")
+
+    async def get_last_hoding_date(self):
+        """从r_north_holding表里获取最新的一条的统计数据的日期，
+        即数据从最新一条数据之后的日期开始
+        """
+        db_conn = self.db_helper.get_conn()
+        cursor = db_conn.cursor()
+        startDate = getNowYYYYMMDD()
+        try:
+            cursor.execute(
+                f"SELECT trade_date  FROM r_north_holding  ORDER BY trade_date DESC limit 1"
             )
             rows = cursor.fetchall()
             print(len(rows))

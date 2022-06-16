@@ -37,4 +37,5 @@ if __name__ == "__main__":
     elif func == "fcapital":
         jyqlogger.info("start to fetch foreign capital data.")
         fcapitalCrawler = FCapitalCrawler()
-        fcapitalCrawler.start_crawfc_dailystat()
+        # fcapitalCrawler.start_crawfc_dailystat()
+        fcapitalCrawler.start_crawfc_holding_data()

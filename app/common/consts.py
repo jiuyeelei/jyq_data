@@ -16,3 +16,7 @@ def is_stock(stock_type):
 
 def is_fund(stock_type):
     return stock_type == FUND_TYPE_ETF
+
+
+FC_MARKET_TYPE_SH = 21  # 沪股通对应的市场代码
+FC_MARKET_TYPE_SZ = 22  # 深股通对应的市场代码
