@@ -1,3 +1,4 @@
+from typing import final
 import common.consts as const
 from datetime import datetime, timedelta
 from importlib.resources import contents
@@ -147,9 +148,14 @@ class FCapitalCrawler:
         db_conn = self.db_helper.get_conn()
         cursor = db_conn.cursor()
         insert_sql = "INSERT INTO invd.r_daily_fcapital_stat(mkt, trade_date, turnover, buy_trades, sell_trades, sum_buysell_amt, buy_amt, sell_amt, daily_quota_balance, daily_quota_balance_percet) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-        cursor.executemany(insert_sql, insert_datas)
-        db_conn.commit()
-        db_conn.close()
+        try:
+            cursor.executemany(insert_sql, insert_datas)
+            db_conn.commit()
+        except Exception as e:
+            jyqlogger.error(e)
+        finally:
+            cursor.close()
+            db_conn.close()
         jyqlogger.info("数据插入完成!")
 
     async def get_lastfc_stat_date(self):
@@ -173,7 +179,9 @@ class FCapitalCrawler:
         except Exception as e:
             jyqlogger.error("Error: unable to fetch data. -->{}", e)
 
-        db_conn.close()
+        finally:
+            cursor.close()
+            db_conn.close()
         return startDate
 
     def start_crawfc_holding_data(self):
@@ -283,7 +291,9 @@ class FCapitalCrawler:
         except Exception as e:
             jyqlogger.error("Error: unable to fetch data. -->{}", e)
 
-        db_conn.close()
+        finally:
+            cursor.close()
+            db_conn.close()
         return startDate
 
     async def insert_hoding_data(self, insert_datas):
@@ -294,8 +304,13 @@ class FCapitalCrawler:
         """
         db_conn = self.db_helper.get_conn()
         cursor = db_conn.cursor()
-        insert_sql = "INSERT INTO invd.r_north_holding(security_mkt, trade_date, security_ccass_code, security_name, holding_amt, holding_amt_rate) VALUES (%s, %s, %s, %s, %s, %s)"
-        cursor.executemany(insert_sql, insert_datas)
-        db_conn.commit()
-        db_conn.close()
+        try:
+            insert_sql = "INSERT INTO invd.r_north_holding(security_mkt, trade_date, security_ccass_code, security_name, holding_amt, holding_amt_rate) VALUES (%s, %s, %s, %s, %s, %s)"
+            cursor.executemany(insert_sql, insert_datas)
+            db_conn.commit()
+        except Exception as e:
+            jyqlogger.error(e)
+        finally:
+            cursor.close()
+            db_conn.close()
         jyqlogger.info("数据插入完成!")

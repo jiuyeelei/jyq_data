@@ -20,7 +20,7 @@ if __name__ == "__main__":
         code = sys.argv[3]
         kline = KlineModel()
         kline.get_daily_kline("601318")
-    elif func == "craw":
+    elif func == "craw_kline":
         kline_crawler = KlineCrawler()
         kline_crawler.start_craw()
     elif func == "cal":
