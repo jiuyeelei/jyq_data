@@ -1,4 +1,6 @@
 from typing import final
+
+from async_timeout import timeout
 import common.consts as const
 from datetime import datetime, timedelta
 from importlib.resources import contents
@@ -204,7 +206,7 @@ class FCapitalCrawler:
             page = await browser.newPage()
             url = f"https://www.hkexnews.hk/sdw/search/mutualmarket_c.aspx?t={market}"
             jyqlogger.info("the target data is {}, the target url is {}", d, url)
-            await page.goto(url)
+            await page.goto(url, {"timeout": 0})
             search_btn_selector = await page.querySelector("#btnSearch")
 
             await page.querySelectorEval(

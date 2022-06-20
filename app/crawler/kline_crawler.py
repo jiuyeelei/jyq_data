@@ -11,6 +11,7 @@ class KlineCrawler:
     def __init__(self):
         self.kline_model = KlineModel()
         self.begin_date = self.kline_model.get_lastest_tdate()
+        print(self.begin_date)
         datas = []
         with open("data/stock_base_info_stocks.json", "r") as stk_base_info:
             stock_datas = json.load(stk_base_info)

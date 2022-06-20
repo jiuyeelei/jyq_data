@@ -92,13 +92,17 @@ class KlineModel:
         cursor = db_conn.cursor()
 
         try:
-            select_sql = f"SELECT trade_date  FROM invd.r_stock_kline order by trade_date desc limit 0, 1"
+            select_sql = f"SELECT trade_date  FROM invd.r_stock_kline order by trade_date desc limit 1"
             cursor.execute(select_sql)
-            if cursor.fetchone() == None:
-                return 0
-            latest_date_str = "".join(cursor.fetchone())
-            latest_date = datetime.strptime(str(latest_date_str), "%Y-%m-%d")
-            targe_date = latest_date + timedelta(days=1)
+
+            rows = cursor.fetchall()
+            print(len(rows))
+            for r in rows:
+                startDate = r[0]
+
+            jyqlogger.info("the start date is:{}", startDate)
+
+            targe_date = startDate + timedelta(days=1)
             return str(targe_date.strftime("%Y%m%d"))
         except Exception as e:
             jyqlogger.error(e)
